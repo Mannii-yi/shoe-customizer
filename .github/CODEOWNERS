@@ -1,0 +1,10 @@
+/apps/web/src/three/ @dev-a
+/apps/web/src/store/shoeStore.js @dev-a
+/apps/web/src/ui/ @dev-b
+/apps/web/src/layout/ @dev-b
+/apps/web/src/landing/ @dev-b
+/apps/web/src/api/ @dev-d
+/apps/web/src/features/ @dev-d
+/apps/api/ @dev-c
+/contracts/ @dev-a @dev-b @dev-c @dev-d
+/.github/ @dev-d

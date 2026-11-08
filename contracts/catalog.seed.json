@@ -1,0 +1,1047 @@
+{
+  "model": {
+    "id": "runner-01",
+    "name": "Runner 01",
+    "basePriceInr": 5999,
+    "glbPath": "/models/runner.glb",
+    "defaultConfiguration": {
+      "parts": {
+        "upper": {
+          "materialId": "mesh",
+          "colorId": "bone"
+        },
+        "toe_cap": {
+          "materialId": "rubber",
+          "colorId": "white"
+        },
+        "heel_counter": {
+          "materialId": "rubber",
+          "colorId": "graphite"
+        },
+        "tongue": {
+          "materialId": "mesh",
+          "colorId": "bone"
+        },
+        "eyestay": {
+          "materialId": "mesh",
+          "colorId": "bone"
+        },
+        "laces": {
+          "materialId": "canvas",
+          "colorId": "white"
+        },
+        "logo": {
+          "materialId": "patent",
+          "colorId": "black"
+        },
+        "insole": {
+          "materialId": "foam",
+          "colorId": "white"
+        },
+        "midsole": {
+          "materialId": "foam",
+          "colorId": "white"
+        },
+        "outsole": {
+          "materialId": "rubber",
+          "colorId": "graphite"
+        }
+      }
+    }
+  },
+  "parts": [
+    {
+      "key": "upper",
+      "label": "Upper",
+      "meshName": "part_upper",
+      "sortOrder": 1,
+      "options": {
+        "materials": [
+          {
+            "id": "mesh",
+            "label": "Mesh",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "leather",
+            "label": "Leather",
+            "priceDeltaInr": 900
+          },
+          {
+            "id": "suede",
+            "label": "Suede",
+            "priceDeltaInr": 700
+          },
+          {
+            "id": "canvas",
+            "label": "Canvas",
+            "priceDeltaInr": 300
+          }
+        ],
+        "colors": [
+          {
+            "id": "graphite",
+            "label": "Graphite",
+            "hex": "#2B2B2E",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "bone",
+            "label": "Bone",
+            "hex": "#E8E1D3",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "black",
+            "label": "Black",
+            "hex": "#111111",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "white",
+            "label": "White",
+            "hex": "#F5F5F2",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "crimson",
+            "label": "Crimson",
+            "hex": "#B3202A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sky",
+            "label": "Sky",
+            "hex": "#5BA4E6",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "forest",
+            "label": "Forest",
+            "hex": "#2F5D3A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sand",
+            "label": "Sand",
+            "hex": "#C8B08A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "neon-lime",
+            "label": "Neon lime",
+            "hex": "#B6FF3B",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "gold",
+            "label": "Gold",
+            "hex": "#D4AF37",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "chrome",
+            "label": "Chrome",
+            "hex": "#C9CDD2",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "sunset",
+            "label": "Sunset",
+            "hex": "#FF6B35",
+            "priceDeltaInr": 0
+          }
+        ]
+      }
+    },
+    {
+      "key": "toe_cap",
+      "label": "Toe cap",
+      "meshName": "part_toe_cap",
+      "sortOrder": 2,
+      "options": {
+        "materials": [
+          {
+            "id": "rubber",
+            "label": "Rubber",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "leather",
+            "label": "Leather",
+            "priceDeltaInr": 200
+          },
+          {
+            "id": "suede",
+            "label": "Suede",
+            "priceDeltaInr": 300
+          },
+          {
+            "id": "patent",
+            "label": "Patent",
+            "priceDeltaInr": 350
+          }
+        ],
+        "colors": [
+          {
+            "id": "graphite",
+            "label": "Graphite",
+            "hex": "#2B2B2E",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "bone",
+            "label": "Bone",
+            "hex": "#E8E1D3",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "black",
+            "label": "Black",
+            "hex": "#111111",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "white",
+            "label": "White",
+            "hex": "#F5F5F2",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "crimson",
+            "label": "Crimson",
+            "hex": "#B3202A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sky",
+            "label": "Sky",
+            "hex": "#5BA4E6",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "forest",
+            "label": "Forest",
+            "hex": "#2F5D3A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sand",
+            "label": "Sand",
+            "hex": "#C8B08A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "neon-lime",
+            "label": "Neon lime",
+            "hex": "#B6FF3B",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "gold",
+            "label": "Gold",
+            "hex": "#D4AF37",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "chrome",
+            "label": "Chrome",
+            "hex": "#C9CDD2",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "sunset",
+            "label": "Sunset",
+            "hex": "#FF6B35",
+            "priceDeltaInr": 0
+          }
+        ]
+      }
+    },
+    {
+      "key": "heel_counter",
+      "label": "Heel counter",
+      "meshName": "part_heel_counter",
+      "sortOrder": 3,
+      "options": {
+        "materials": [
+          {
+            "id": "rubber",
+            "label": "Rubber",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "leather",
+            "label": "Leather",
+            "priceDeltaInr": 250
+          },
+          {
+            "id": "suede",
+            "label": "Suede",
+            "priceDeltaInr": 200
+          }
+        ],
+        "colors": [
+          {
+            "id": "graphite",
+            "label": "Graphite",
+            "hex": "#2B2B2E",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "bone",
+            "label": "Bone",
+            "hex": "#E8E1D3",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "black",
+            "label": "Black",
+            "hex": "#111111",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "white",
+            "label": "White",
+            "hex": "#F5F5F2",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "crimson",
+            "label": "Crimson",
+            "hex": "#B3202A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sky",
+            "label": "Sky",
+            "hex": "#5BA4E6",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "forest",
+            "label": "Forest",
+            "hex": "#2F5D3A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sand",
+            "label": "Sand",
+            "hex": "#C8B08A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "neon-lime",
+            "label": "Neon lime",
+            "hex": "#B6FF3B",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "gold",
+            "label": "Gold",
+            "hex": "#D4AF37",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "chrome",
+            "label": "Chrome",
+            "hex": "#C9CDD2",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "sunset",
+            "label": "Sunset",
+            "hex": "#FF6B35",
+            "priceDeltaInr": 0
+          }
+        ]
+      }
+    },
+    {
+      "key": "tongue",
+      "label": "Tongue",
+      "meshName": "part_tongue",
+      "sortOrder": 4,
+      "options": {
+        "materials": [
+          {
+            "id": "mesh",
+            "label": "Mesh",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "canvas",
+            "label": "Canvas",
+            "priceDeltaInr": 100
+          },
+          {
+            "id": "leather",
+            "label": "Leather",
+            "priceDeltaInr": 300
+          }
+        ],
+        "colors": [
+          {
+            "id": "graphite",
+            "label": "Graphite",
+            "hex": "#2B2B2E",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "bone",
+            "label": "Bone",
+            "hex": "#E8E1D3",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "black",
+            "label": "Black",
+            "hex": "#111111",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "white",
+            "label": "White",
+            "hex": "#F5F5F2",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "crimson",
+            "label": "Crimson",
+            "hex": "#B3202A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sky",
+            "label": "Sky",
+            "hex": "#5BA4E6",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "forest",
+            "label": "Forest",
+            "hex": "#2F5D3A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sand",
+            "label": "Sand",
+            "hex": "#C8B08A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "neon-lime",
+            "label": "Neon lime",
+            "hex": "#B6FF3B",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "gold",
+            "label": "Gold",
+            "hex": "#D4AF37",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "chrome",
+            "label": "Chrome",
+            "hex": "#C9CDD2",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "sunset",
+            "label": "Sunset",
+            "hex": "#FF6B35",
+            "priceDeltaInr": 0
+          }
+        ]
+      }
+    },
+    {
+      "key": "eyestay",
+      "label": "Eyestay (lace panel)",
+      "meshName": "part_eyestay",
+      "sortOrder": 5,
+      "options": {
+        "materials": [
+          {
+            "id": "mesh",
+            "label": "Mesh",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "leather",
+            "label": "Leather",
+            "priceDeltaInr": 200
+          },
+          {
+            "id": "suede",
+            "label": "Suede",
+            "priceDeltaInr": 200
+          }
+        ],
+        "colors": [
+          {
+            "id": "graphite",
+            "label": "Graphite",
+            "hex": "#2B2B2E",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "bone",
+            "label": "Bone",
+            "hex": "#E8E1D3",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "black",
+            "label": "Black",
+            "hex": "#111111",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "white",
+            "label": "White",
+            "hex": "#F5F5F2",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "crimson",
+            "label": "Crimson",
+            "hex": "#B3202A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sky",
+            "label": "Sky",
+            "hex": "#5BA4E6",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "forest",
+            "label": "Forest",
+            "hex": "#2F5D3A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sand",
+            "label": "Sand",
+            "hex": "#C8B08A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "neon-lime",
+            "label": "Neon lime",
+            "hex": "#B6FF3B",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "gold",
+            "label": "Gold",
+            "hex": "#D4AF37",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "chrome",
+            "label": "Chrome",
+            "hex": "#C9CDD2",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "sunset",
+            "label": "Sunset",
+            "hex": "#FF6B35",
+            "priceDeltaInr": 0
+          }
+        ]
+      }
+    },
+    {
+      "key": "laces",
+      "label": "Laces",
+      "meshName": "part_laces",
+      "sortOrder": 6,
+      "options": {
+        "materials": [
+          {
+            "id": "canvas",
+            "label": "Canvas",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "mesh",
+            "label": "Mesh",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "patent",
+            "label": "Patent",
+            "priceDeltaInr": 100
+          }
+        ],
+        "colors": [
+          {
+            "id": "graphite",
+            "label": "Graphite",
+            "hex": "#2B2B2E",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "bone",
+            "label": "Bone",
+            "hex": "#E8E1D3",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "black",
+            "label": "Black",
+            "hex": "#111111",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "white",
+            "label": "White",
+            "hex": "#F5F5F2",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "crimson",
+            "label": "Crimson",
+            "hex": "#B3202A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sky",
+            "label": "Sky",
+            "hex": "#5BA4E6",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "forest",
+            "label": "Forest",
+            "hex": "#2F5D3A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sand",
+            "label": "Sand",
+            "hex": "#C8B08A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "neon-lime",
+            "label": "Neon lime",
+            "hex": "#B6FF3B",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "gold",
+            "label": "Gold",
+            "hex": "#D4AF37",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "chrome",
+            "label": "Chrome",
+            "hex": "#C9CDD2",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "sunset",
+            "label": "Sunset",
+            "hex": "#FF6B35",
+            "priceDeltaInr": 0
+          }
+        ]
+      }
+    },
+    {
+      "key": "logo",
+      "label": "Logo patch",
+      "meshName": "part_logo",
+      "sortOrder": 7,
+      "options": {
+        "materials": [
+          {
+            "id": "patent",
+            "label": "Patent",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "leather",
+            "label": "Leather",
+            "priceDeltaInr": 100
+          },
+          {
+            "id": "rubber",
+            "label": "Rubber",
+            "priceDeltaInr": 0
+          }
+        ],
+        "colors": [
+          {
+            "id": "graphite",
+            "label": "Graphite",
+            "hex": "#2B2B2E",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "bone",
+            "label": "Bone",
+            "hex": "#E8E1D3",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "black",
+            "label": "Black",
+            "hex": "#111111",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "white",
+            "label": "White",
+            "hex": "#F5F5F2",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "crimson",
+            "label": "Crimson",
+            "hex": "#B3202A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sky",
+            "label": "Sky",
+            "hex": "#5BA4E6",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "forest",
+            "label": "Forest",
+            "hex": "#2F5D3A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sand",
+            "label": "Sand",
+            "hex": "#C8B08A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "neon-lime",
+            "label": "Neon lime",
+            "hex": "#B6FF3B",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "gold",
+            "label": "Gold",
+            "hex": "#D4AF37",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "chrome",
+            "label": "Chrome",
+            "hex": "#C9CDD2",
+            "priceDeltaInr": 150
+          },
+          {
+            "id": "sunset",
+            "label": "Sunset",
+            "hex": "#FF6B35",
+            "priceDeltaInr": 0
+          }
+        ]
+      }
+    },
+    {
+      "key": "insole",
+      "label": "Insole",
+      "meshName": "part_insole",
+      "sortOrder": 8,
+      "options": {
+        "materials": [
+          {
+            "id": "foam",
+            "label": "Foam",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "mesh",
+            "label": "Mesh",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "leather",
+            "label": "Leather",
+            "priceDeltaInr": 350
+          }
+        ],
+        "colors": [
+          {
+            "id": "graphite",
+            "label": "Graphite",
+            "hex": "#2B2B2E",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "bone",
+            "label": "Bone",
+            "hex": "#E8E1D3",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "black",
+            "label": "Black",
+            "hex": "#111111",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "white",
+            "label": "White",
+            "hex": "#F5F5F2",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "crimson",
+            "label": "Crimson",
+            "hex": "#B3202A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sky",
+            "label": "Sky",
+            "hex": "#5BA4E6",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "forest",
+            "label": "Forest",
+            "hex": "#2F5D3A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sand",
+            "label": "Sand",
+            "hex": "#C8B08A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sunset",
+            "label": "Sunset",
+            "hex": "#FF6B35",
+            "priceDeltaInr": 0
+          }
+        ]
+      }
+    },
+    {
+      "key": "midsole",
+      "label": "Midsole",
+      "meshName": "part_midsole",
+      "sortOrder": 9,
+      "options": {
+        "materials": [
+          {
+            "id": "foam",
+            "label": "Foam",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "rubber",
+            "label": "Rubber",
+            "priceDeltaInr": 400
+          }
+        ],
+        "colors": [
+          {
+            "id": "graphite",
+            "label": "Graphite",
+            "hex": "#2B2B2E",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "bone",
+            "label": "Bone",
+            "hex": "#E8E1D3",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "black",
+            "label": "Black",
+            "hex": "#111111",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "white",
+            "label": "White",
+            "hex": "#F5F5F2",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "crimson",
+            "label": "Crimson",
+            "hex": "#B3202A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sky",
+            "label": "Sky",
+            "hex": "#5BA4E6",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "forest",
+            "label": "Forest",
+            "hex": "#2F5D3A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sand",
+            "label": "Sand",
+            "hex": "#C8B08A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sunset",
+            "label": "Sunset",
+            "hex": "#FF6B35",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "neon-lime",
+            "label": "Neon lime",
+            "hex": "#B6FF3B",
+            "priceDeltaInr": 150
+          }
+        ]
+      }
+    },
+    {
+      "key": "outsole",
+      "label": "Outsole",
+      "meshName": "part_outsole",
+      "sortOrder": 10,
+      "options": {
+        "materials": [
+          {
+            "id": "rubber",
+            "label": "Rubber",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "foam",
+            "label": "Foam",
+            "priceDeltaInr": 200
+          }
+        ],
+        "colors": [
+          {
+            "id": "graphite",
+            "label": "Graphite",
+            "hex": "#2B2B2E",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "bone",
+            "label": "Bone",
+            "hex": "#E8E1D3",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "black",
+            "label": "Black",
+            "hex": "#111111",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "white",
+            "label": "White",
+            "hex": "#F5F5F2",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "crimson",
+            "label": "Crimson",
+            "hex": "#B3202A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sky",
+            "label": "Sky",
+            "hex": "#5BA4E6",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "forest",
+            "label": "Forest",
+            "hex": "#2F5D3A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sand",
+            "label": "Sand",
+            "hex": "#C8B08A",
+            "priceDeltaInr": 0
+          },
+          {
+            "id": "sunset",
+            "label": "Sunset",
+            "hex": "#FF6B35",
+            "priceDeltaInr": 0
+          }
+        ]
+      }
+    }
+  ],
+  "rules": [
+    {
+      "id": "combo-leather-upper-suede-toe",
+      "label": "Luxe contrast: leather upper + suede toe cap",
+      "type": "COMBO_SURCHARGE",
+      "params": {
+        "when": [
+          {
+            "partKey": "upper",
+            "kind": "MATERIAL",
+            "slug": "leather"
+          },
+          {
+            "partKey": "toe_cap",
+            "kind": "MATERIAL",
+            "slug": "suede"
+          }
+        ],
+        "amountInr": 250
+      }
+    },
+    {
+      "id": "combo-leather-upper-patent-toe",
+      "label": "Gloss finish: leather upper + patent toe cap",
+      "type": "COMBO_SURCHARGE",
+      "params": {
+        "when": [
+          {
+            "partKey": "upper",
+            "kind": "MATERIAL",
+            "slug": "leather"
+          },
+          {
+            "partKey": "toe_cap",
+            "kind": "MATERIAL",
+            "slug": "patent"
+          }
+        ],
+        "amountInr": 250
+      }
+    },
+    {
+      "id": "discount-5-changed-parts",
+      "label": "5% off customization extras when 5+ parts changed",
+      "type": "CUSTOMIZATION_DISCOUNT_PCT",
+      "params": {
+        "minChangedParts": 5,
+        "percent": 5
+      }
+    }
+  ]
+}
