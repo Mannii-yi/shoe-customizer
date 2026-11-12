@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OptionKind {
+  MATERIAL
+  COLOR
+}
+
+enum RuleType {
+  COMBO_SURCHARGE
+  CUSTOMIZATION_DISCOUNT_PCT
+}
+
+enum OrderStatus {
+  PAID_MOCK
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+  designs      Design[]
+  cart         Cart?
+  orders       Order[]
+
+  @@map("users")
+}
+
+model ShoeModel {
+  id                   String      @id
+  name                 String
+  basePriceInr         Int
+  glbPath              String
+  defaultConfiguration Json
+  isActive             Boolean     @default(true)
+  parts                Part[]
+  rules                PriceRule[]
+  designs              Design[]
+
+  @@map("shoe_models")
+}
+
+model Part {
+  id        String       @id @default(cuid())
+  modelId   String
+  model     ShoeModel    @relation(fields: [modelId], references: [id])
+  key       String
+  label     String
+  meshName  String
+  sortOrder Int
+  options   PartOption[]
+
+  @@unique([modelId, key])
+  @@map("parts")
+}
+
+model PartOption {
+  id            String     @id @default(cuid())
+  partId        String
+  part          Part       @relation(fields: [partId], references: [id])
+  kind          OptionKind
+  slug          String
+  label         String
+  value         String?
+  priceDeltaInr Int        @default(0)
+  isActive      Boolean    @default(true)
+
+  @@unique([partId, kind, slug])
+  @@map("part_options")
+}
+
+model PriceRule {
+  id       String    @id @default(cuid())
+  modelId  String
+  model    ShoeModel @relation(fields: [modelId], references: [id])
+  type     RuleType
+  label    String
+  params   Json
+  isActive Boolean   @default(true)
+
+  @@map("price_rules")
+}
+
+model Design {
+  id               String     @id @default(uuid())
+  userId           String
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  modelId          String
+  model            ShoeModel  @relation(fields: [modelId], references: [id])
+  name             String
+  configuration    Json
+  priceInr         Int
+  thumbnailDataUrl String?
+  shareToken       String?    @unique
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  cartItems        CartItem[]
+
+  @@map("designs")
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  updatedAt DateTime   @updatedAt
+
+  @@map("carts")
+}
+
+model CartItem {
+  id       String @id @default(cuid())
+  cartId   String
+  cart     Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  designId String
+  design   Design @relation(fields: [designId], references: [id], onDelete: Cascade)
+  sizeEu   Int
+  quantity Int
+
+  @@unique([cartId, designId, sizeEu])
+  @@map("cart_items")
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  status          OrderStatus @default(PAID_MOCK)
+  subtotalInr     Int
+  shippingInr     Int
+  totalInr        Int
+  shippingAddress Json
+  createdAt       DateTime    @default(now())
+  items           OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  designId     String?
+  modelId      String
+  configuration Json
+  sizeEu       Int
+  quantity     Int
+  unitPriceInr Int
+  lines        Json
+
+  @@map("order_items")
+}
