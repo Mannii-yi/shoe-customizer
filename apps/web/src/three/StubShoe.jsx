@@ -72,6 +72,19 @@ export function StubShoe({ interactive = false }) {
     };
   }, []);
 
+
+  
+  // Tell the rest of the app the "model" is ready: Dev B's preloader waits for
+  // isModelReady. The stub is ready instantly; the real GLB loader will set
+  // this once the file has loaded. Reset to false if the scene goes away.
+  useEffect(() => {
+    useShoeStore.getState().setModelReady(true);
+
+    return () => {
+      useShoeStore.getState().setModelReady(false);
+    };
+  }, []);
+  
   // Runs about 60 times per second.
   useFrame(() => {
     // getState() reads the latest value without making React re-draw.
