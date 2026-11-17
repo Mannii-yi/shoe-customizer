@@ -1,0 +1,940 @@
+openapi: 3.1.0
+info:
+  title: Shoe Customizer API
+  version: 1.0.0
+  description: |
+    REST API for the Shoe Customizer. Source of truth for request and response shapes.
+    Changes after the Day 2 freeze need approval from all four developers (contract PR).
+
+    Rules that apply everywhere:
+    - All amounts are INTEGER whole rupees (INR). Field names end in `Inr`.
+    - The price is calculated ONLY by the server. Any total sent by a client is ignored.
+    - Every non-2xx response uses the `ErrorResponse` format.
+    - A part counts as "changed" when its material OR its color differs from the default configuration.
+servers:
+  - url: http://localhost:4000/api/v1
+    description: Local development
+tags:
+  - name: Health
+  - name: Auth
+  - name: Catalog
+  - name: Pricing
+  - name: Designs
+  - name: Cart
+  - name: Orders
+  - name: Admin
+    description: ADVANCED. Only built if the core is finished.
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Liveness check and warm-up
+      operationId: getHealth
+      responses:
+        '200':
+          description: The API is running
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: { type: string, const: ok }
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Create an account
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in
+      description: Failures always return the same generic 401 message (no user enumeration).
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Current user
+      operationId: getMe
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: The logged-in user
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user]
+                properties:
+                  user: { $ref: '#/components/schemas/User' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /models:
+    get:
+      tags: [Catalog]
+      summary: List shoe models
+      operationId: listModels
+      responses:
+        '200':
+          description: Active models
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [models]
+                properties:
+                  models:
+                    type: array
+                    items: { $ref: '#/components/schemas/ModelSummary' }
+
+  /models/{modelId}/catalog:
+    get:
+      tags: [Catalog]
+      summary: Parts, options, colors, price deltas and default configuration
+      description: Rules show id, label and type only. Rule parameters are never exposed.
+      operationId: getCatalog
+      parameters:
+        - { $ref: '#/components/parameters/ModelId' }
+      responses:
+        '200':
+          description: The catalog
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Catalog' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /price/quote:
+    post:
+      tags: [Pricing]
+      summary: Validate and price a configuration (guests allowed)
+      description: |
+        Wrong body shape returns 400. A well-formed configuration that does not match the
+        catalog returns 422 INVALID_CONFIGURATION with one detail per problem.
+      operationId: quote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/QuoteRequest' }
+      responses:
+        '200':
+          description: Itemized price
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Quote' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/InvalidConfiguration' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /designs:
+    get:
+      tags: [Designs]
+      summary: List my designs
+      operationId: listDesigns
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Own designs only
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [designs]
+                properties:
+                  designs:
+                    type: array
+                    items: { $ref: '#/components/schemas/Design' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [Designs]
+      summary: Save a design (price is snapshotted by the server)
+      operationId: createDesign
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DesignCreate' }
+      responses:
+        '201':
+          description: Design saved
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [design]
+                properties:
+                  design: { $ref: '#/components/schemas/Design' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/InvalidConfiguration' }
+
+  /designs/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/DesignId' }
+    get:
+      tags: [Designs]
+      summary: Get one of my designs
+      description: Other users' designs return 404, not 403.
+      operationId: getDesign
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: The design
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [design]
+                properties:
+                  design: { $ref: '#/components/schemas/Design' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Designs]
+      summary: Update a design (price is re-snapshotted)
+      operationId: updateDesign
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DesignUpdate' }
+      responses:
+        '200':
+          description: Updated design
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [design]
+                properties:
+                  design: { $ref: '#/components/schemas/Design' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/InvalidConfiguration' }
+    delete:
+      tags: [Designs]
+      summary: Delete a design
+      operationId: deleteDesign
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204': { description: Deleted }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /designs/{id}/share:
+    post:
+      tags: [Designs]
+      summary: Create (or return the existing) share link for a design
+      operationId: shareDesign
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/DesignId' }
+      responses:
+        '200':
+          description: Share token
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [shareToken, sharePath]
+                properties:
+                  shareToken: { type: string }
+                  sharePath: { type: string, examples: ['/shared/Zm9vYmFy'] }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /shared/{token}:
+    get:
+      tags: [Designs]
+      summary: Public read-only design (no owner information)
+      operationId: getSharedDesign
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 100 }
+      responses:
+        '200':
+          description: The shared design
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [design]
+                properties:
+                  design: { $ref: '#/components/schemas/Design' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /cart:
+    get:
+      tags: [Cart]
+      summary: My cart (every price recomputed from the current catalog)
+      operationId: getCart
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: The cart
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Cart' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /cart/items:
+    post:
+      tags: [Cart]
+      summary: Add a design to the cart
+      description: Adding the same design and size again merges by summing quantity (capped at 5).
+      operationId: addCartItem
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CartItemCreate' }
+      responses:
+        '201': { $ref: '#/components/responses/CartResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /cart/items/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/CartItemId' }
+    patch:
+      tags: [Cart]
+      summary: Change quantity or size
+      operationId: updateCartItem
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CartItemUpdate' }
+      responses:
+        '200': { $ref: '#/components/responses/CartResponse' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Cart]
+      summary: Remove an item
+      operationId: deleteCartItem
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/CartResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /orders/checkout:
+    post:
+      tags: [Orders]
+      summary: MOCK checkout
+      description: |
+        Runs in one database transaction: loads the cart (409 if empty), re-validates and
+        re-prices every item from the current catalog, snapshots configuration and price lines,
+        adds flat shipping of 99, saves the order as PAID_MOCK and clears the cart.
+        No real payment happens. Any price sent by the client is ignored.
+      operationId: checkout
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CheckoutRequest' }
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [order]
+                properties:
+                  order: { $ref: '#/components/schemas/Order' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/InvalidConfiguration' }
+
+  /orders:
+    get:
+      tags: [Orders]
+      summary: My orders
+      operationId: listOrders
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Own orders, newest first
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [orders]
+                properties:
+                  orders:
+                    type: array
+                    items: { $ref: '#/components/schemas/Order' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /orders/{id}:
+    get:
+      tags: [Orders]
+      summary: One of my orders
+      operationId: getOrder
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: '#/components/parameters/OrderId' }
+      responses:
+        '200':
+          description: The order
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [order]
+                properties:
+                  order: { $ref: '#/components/schemas/Order' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /admin/options:
+    get:
+      tags: [Admin]
+      summary: ADVANCED. List all options with prices and active flags
+      description: Response shape is a proposal; the original contract did not define it.
+      operationId: adminListOptions
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: All options
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [options]
+                properties:
+                  options:
+                    type: array
+                    items: { $ref: '#/components/schemas/AdminOption' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /admin/options/{id}:
+    patch:
+      tags: [Admin]
+      summary: ADVANCED. Edit an option's price or active flag
+      description: Response shape is a proposal; the original contract did not define it.
+      operationId: adminUpdateOption
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              additionalProperties: false
+              properties:
+                priceDeltaInr: { type: integer, minimum: 0 }
+                isActive: { type: boolean }
+      responses:
+        '200':
+          description: Updated option
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [option]
+                properties:
+                  option: { $ref: '#/components/schemas/AdminOption' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'Send `Authorization: Bearer <token>`. Tokens last 7 days.'
+
+  parameters:
+    ModelId:
+      name: modelId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 60, examples: [runner-01] }
+    DesignId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    CartItemId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, minLength: 1, maxLength: 60 }
+    OrderId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    CartResponse:
+      description: The updated cart
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [cart]
+            properties:
+              cart: { $ref: '#/components/schemas/Cart' }
+    ValidationError:
+      description: VALIDATION_ERROR. The request has the wrong shape.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Unauthorized:
+      description: UNAUTHORIZED. Missing, invalid or expired token, or wrong login.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Forbidden:
+      description: FORBIDDEN. The user's role is not allowed.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    NotFound:
+      description: NOT_FOUND. Also returned for another user's private resource.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Conflict:
+      description: CONFLICT. Duplicate email, or checkout with an empty cart.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    InvalidConfiguration:
+      description: INVALID_CONFIGURATION. Details list every problem found.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            error:
+              code: INVALID_CONFIGURATION
+              message: The configuration is not valid
+              details:
+                - { partKey: upper, field: colorId, reason: color not available for this part }
+    RateLimited:
+      description: RATE_LIMITED. Too many requests.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_ERROR
+                - UNAUTHORIZED
+                - FORBIDDEN
+                - NOT_FOUND
+                - CONFLICT
+                - INVALID_CONFIGURATION
+                - RATE_LIMITED
+                - INTERNAL
+            message: { type: string }
+            details:
+              type: array
+              description: >
+                Optional. For INVALID_CONFIGURATION each item is {partKey, field, reason};
+                for VALIDATION_ERROR each item is {field, reason}.
+              items: { type: object, additionalProperties: true }
+
+    Slug:
+      type: string
+      pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+      maxLength: 40
+
+    PartChoice:
+      type: object
+      required: [materialId, colorId]
+      additionalProperties: false
+      properties:
+        materialId: { $ref: '#/components/schemas/Slug' }
+        colorId: { $ref: '#/components/schemas/Slug' }
+
+    # Mirrors contracts/configuration.schema.json. Keep the two in sync.
+    Configuration:
+      type: object
+      required: [parts]
+      additionalProperties: false
+      properties:
+        parts:
+          type: object
+          required: [upper, toe_cap, heel_counter, tongue, eyestay, laces, logo, insole, midsole, outsole]
+          additionalProperties: false
+          properties:
+            upper: { $ref: '#/components/schemas/PartChoice' }
+            toe_cap: { $ref: '#/components/schemas/PartChoice' }
+            heel_counter: { $ref: '#/components/schemas/PartChoice' }
+            tongue: { $ref: '#/components/schemas/PartChoice' }
+            eyestay: { $ref: '#/components/schemas/PartChoice' }
+            laces: { $ref: '#/components/schemas/PartChoice' }
+            logo: { $ref: '#/components/schemas/PartChoice' }
+            insole: { $ref: '#/components/schemas/PartChoice' }
+            midsole: { $ref: '#/components/schemas/PartChoice' }
+            outsole: { $ref: '#/components/schemas/PartChoice' }
+
+    ModelSummary:
+      type: object
+      required: [id, name, basePriceInr, glbPath]
+      properties:
+        id: { type: string, examples: [runner-01] }
+        name: { type: string }
+        basePriceInr: { type: integer, minimum: 0 }
+        glbPath: { type: string }
+
+    MaterialOption:
+      type: object
+      required: [id, label, priceDeltaInr]
+      properties:
+        id: { $ref: '#/components/schemas/Slug' }
+        label: { type: string }
+        priceDeltaInr: { type: integer }
+
+    ColorOption:
+      type: object
+      required: [id, label, hex, priceDeltaInr]
+      properties:
+        id: { $ref: '#/components/schemas/Slug' }
+        label: { type: string }
+        hex: { type: string, pattern: '^#[0-9A-Fa-f]{6}$' }
+        priceDeltaInr: { type: integer }
+
+    CatalogPart:
+      type: object
+      required: [key, label, meshName, sortOrder, options]
+      properties:
+        key: { type: string }
+        label: { type: string }
+        meshName: { type: string }
+        sortOrder: { type: integer }
+        options:
+          type: object
+          required: [materials, colors]
+          properties:
+            materials:
+              type: array
+              items: { $ref: '#/components/schemas/MaterialOption' }
+            colors:
+              type: array
+              items: { $ref: '#/components/schemas/ColorOption' }
+
+    RuleSummary:
+      type: object
+      required: [id, label, type]
+      properties:
+        id: { type: string }
+        label: { type: string }
+        type:
+          type: string
+          enum: [COMBO_SURCHARGE, CUSTOMIZATION_DISCOUNT_PCT]
+
+    Catalog:
+      type: object
+      required: [model, parts, rules]
+      properties:
+        model:
+          allOf:
+            - { $ref: '#/components/schemas/ModelSummary' }
+            - type: object
+              required: [defaultConfiguration]
+              properties:
+                defaultConfiguration: { $ref: '#/components/schemas/Configuration' }
+        parts:
+          type: array
+          items: { $ref: '#/components/schemas/CatalogPart' }
+        rules:
+          type: array
+          items: { $ref: '#/components/schemas/RuleSummary' }
+
+    QuoteRequest:
+      type: object
+      required: [modelId, configuration]
+      properties:
+        modelId: { type: string, minLength: 1, maxLength: 60, examples: [runner-01] }
+        configuration: { $ref: '#/components/schemas/Configuration' }
+
+    QuoteLine:
+      type: object
+      required: [type, partKey, label, amountInr]
+      properties:
+        type: { type: string, enum: [OPTION, RULE, DISCOUNT] }
+        partKey:
+          type: [string, 'null']
+          description: The part this line belongs to. null for RULE and DISCOUNT lines.
+        label: { type: string, examples: ['Upper: Leather'] }
+        amountInr:
+          type: integer
+          description: Negative for DISCOUNT lines.
+
+    Quote:
+      type: object
+      required: [modelId, currency, basePriceInr, lines, totalInr]
+      properties:
+        modelId: { type: string }
+        currency: { type: string, const: INR }
+        basePriceInr: { type: integer }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/QuoteLine' }
+        totalInr:
+          type: integer
+          description: basePriceInr plus the sum of all line amounts.
+
+    User:
+      type: object
+      required: [id, name, email, role]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        email: { type: string, format: email }
+        role: { type: string, enum: [USER, ADMIN] }
+
+    RegisterRequest:
+      type: object
+      required: [name, email, password]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        email: { type: string, format: email, maxLength: 254 }
+        password:
+          type: string
+          minLength: 8
+          maxLength: 72
+          description: At least 8 characters. Max 72 because bcrypt ignores anything longer.
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        password: { type: string, minLength: 1, maxLength: 72 }
+
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token: { type: string }
+        user: { $ref: '#/components/schemas/User' }
+
+    ThumbnailDataUrl:
+      type: string
+      pattern: '^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$'
+      maxLength: 205000
+      description: >
+        Image data URL. The image itself is at most 150 KB; base64 text is about a third
+        longer, so the string limit is about 205,000 characters.
+
+    Design:
+      type: object
+      required: [id, modelId, name, configuration, priceInr, thumbnailDataUrl, shareToken, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        modelId: { type: string }
+        name: { type: string }
+        configuration: { $ref: '#/components/schemas/Configuration' }
+        priceInr:
+          type: integer
+          description: Price snapshot taken when the design was saved or last updated.
+        thumbnailDataUrl:
+          oneOf:
+            - { $ref: '#/components/schemas/ThumbnailDataUrl' }
+            - { type: 'null' }
+        shareToken: { type: [string, 'null'] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    DesignCreate:
+      type: object
+      required: [modelId, name, configuration]
+      properties:
+        modelId: { type: string, minLength: 1, maxLength: 60 }
+        name: { type: string, minLength: 1, maxLength: 80 }
+        configuration: { $ref: '#/components/schemas/Configuration' }
+        thumbnailDataUrl: { $ref: '#/components/schemas/ThumbnailDataUrl' }
+
+    DesignUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        configuration: { $ref: '#/components/schemas/Configuration' }
+        thumbnailDataUrl: { $ref: '#/components/schemas/ThumbnailDataUrl' }
+
+    CartItemCreate:
+      type: object
+      required: [designId, sizeEu, quantity]
+      properties:
+        designId: { type: string, format: uuid }
+        sizeEu: { type: integer, minimum: 36, maximum: 46 }
+        quantity: { type: integer, minimum: 1, maximum: 5 }
+
+    CartItemUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        sizeEu: { type: integer, minimum: 36, maximum: 46 }
+        quantity: { type: integer, minimum: 1, maximum: 5 }
+
+    CartItem:
+      type: object
+      required: [id, design, sizeEu, quantity, unitPriceInr, lineTotalInr]
+      properties:
+        id: { type: string }
+        design:
+          type: object
+          required: [id, name, modelId, configuration, thumbnailDataUrl]
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: string }
+            modelId: { type: string }
+            configuration: { $ref: '#/components/schemas/Configuration' }
+            thumbnailDataUrl:
+              oneOf:
+                - { $ref: '#/components/schemas/ThumbnailDataUrl' }
+                - { type: 'null' }
+        sizeEu: { type: integer }
+        quantity: { type: integer }
+        unitPriceInr:
+          type: integer
+          description: Recomputed from the current catalog on every read.
+        lineTotalInr:
+          type: integer
+          description: unitPriceInr times quantity.
+
+    Cart:
+      type: object
+      required: [items, subtotalInr]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/CartItem' }
+        subtotalInr: { type: integer }
+
+    Address:
+      type: object
+      required: [fullName, phone, line1, city, state, pincode]
+      properties:
+        fullName: { type: string, minLength: 1, maxLength: 100 }
+        phone: { type: string, pattern: '^[0-9]{10}$' }
+        line1: { type: string, minLength: 1, maxLength: 200 }
+        line2: { type: string, maxLength: 200 }
+        city: { type: string, minLength: 1, maxLength: 100 }
+        state: { type: string, minLength: 1, maxLength: 100 }
+        pincode: { type: string, pattern: '^[0-9]{6}$' }
+
+    CheckoutRequest:
+      type: object
+      required: [shippingAddress, paymentMethod]
+      properties:
+        shippingAddress: { $ref: '#/components/schemas/Address' }
+        paymentMethod: { type: string, const: MOCK }
+
+    OrderItem:
+      type: object
+      required: [id, designId, modelId, configuration, sizeEu, quantity, unitPriceInr, lines]
+      properties:
+        id: { type: string }
+        designId:
+          type: [string, 'null']
+          description: null if the design was deleted after the order.
+        modelId: { type: string }
+        configuration: { $ref: '#/components/schemas/Configuration' }
+        sizeEu: { type: integer }
+        quantity: { type: integer }
+        unitPriceInr: { type: integer }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/QuoteLine' }
+
+    Order:
+      type: object
+      required: [id, status, items, subtotalInr, shippingInr, totalInr, shippingAddress, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        status: { type: string, enum: [PAID_MOCK, CANCELLED] }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/OrderItem' }
+        subtotalInr: { type: integer }
+        shippingInr: { type: integer, description: Flat 99 in this build. }
+        totalInr: { type: integer }
+        shippingAddress: { $ref: '#/components/schemas/Address' }
+        createdAt: { type: string, format: date-time }
+
+    AdminOption:
+      type: object
+      required: [id, partKey, kind, slug, label, value, priceDeltaInr, isActive]
+      properties:
+        id: { type: string }
+        partKey: { type: string }
+        kind: { type: string, enum: [MATERIAL, COLOR] }
+        slug: { type: string }
+        label: { type: string }
+        value: { type: [string, 'null'], description: Hex color for COLOR options. }
+        priceDeltaInr: { type: integer }
+        isActive: { type: boolean }
