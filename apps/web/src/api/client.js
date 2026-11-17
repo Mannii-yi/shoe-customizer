@@ -39,9 +39,9 @@ export async function apiRequest(path, options = {}) {
 
     throw new ApiError({
       status: response.status,
-      code: data?.code || 'REQUEST_FAILED',
-      message: data?.message || 'Something went wrong.',
-      details: data?.details || null,
+      code: data?.error?.code || 'REQUEST_FAILED',
+      message: data?.error?.message || 'Something went wrong.',
+      details: data?.error?.details || null,
     });
   }
 
