@@ -5,6 +5,8 @@ import { validate } from '../middleware/validate.js';
 import { getPublicCatalog, getInternalCatalog, listModels } from '../services/catalogService.js';
 import { calculateQuote } from '../services/pricing.js';
 import authRoutes from './auth.js';
+import designRoutes from './designs.js';
+import sharedRoutes from './shared.js';
 
 const router = Router();
 
@@ -17,6 +19,8 @@ const quoteBody = z.object({
 });
 
 router.use('/auth', authRoutes);
+router.use('/designs', designRoutes);
+router.use('/shared', sharedRoutes);
 
 router.get('/health', (req, res) => {
   res.json({ status: 'ok' });

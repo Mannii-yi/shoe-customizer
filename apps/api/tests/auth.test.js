@@ -16,11 +16,11 @@ const hasDb = Boolean(process.env.DATABASE_URL);
 
 // Test accounts use unique "test+<uuid>" emails and are deleted afterwards,
 // so these tests never touch real data and can run against a dev database.
-const newEmail = () => `test+${randomUUID()}@example.com`;
+const newEmail = () => `test+auth-${randomUUID()}@example.com`;
 const password = 'correct-horse-9';
 
 afterAll(async () => {
-  if (hasDb) await prisma.user.deleteMany({ where: { email: { startsWith: 'test+' } } });
+  if (hasDb) await prisma.user.deleteMany({ where: { email: { startsWith: 'test+auth-' } } });
   await prisma.$disconnect();
 });
 
