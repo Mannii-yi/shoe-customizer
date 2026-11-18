@@ -8,3 +8,6 @@
 /apps/api/ @dev-c
 /contracts/ @dev-a @dev-b @dev-c @dev-d
 /.github/ @dev-d
+/apps/web/src/styles/ @dev-b
+/apps/web/src/pages/Landing.jsx @dev-b
+/apps/web/tailwind.config.cjs @dev-b
