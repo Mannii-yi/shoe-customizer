@@ -7,6 +7,8 @@ import Designs from './pages/Designs';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
+import NotFound from './pages/NotFound';
+import SharedDesign from './pages/SharedDesign';
 
 function App() {
   return (
@@ -14,14 +16,16 @@ function App() {
       <Route path="/" element={<Navigate to="/login" replace />} />
 
       <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/customizer" element={<Customizer />} />
+      <Route path="/register" element={<Signup />} />
+      <Route path="/customize" element={<Customizer />} />
       <Route path="/designs" element={<Designs />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/orders" element={<Orders />} />
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="/shared/:token" element={<SharedDesign />} />
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
