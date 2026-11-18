@@ -4,6 +4,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { validate } from '../middleware/validate.js';
 import { getPublicCatalog, getInternalCatalog, listModels } from '../services/catalogService.js';
 import { calculateQuote } from '../services/pricing.js';
+import authRoutes from './auth.js';
 
 const router = Router();
 
@@ -14,6 +15,8 @@ const quoteBody = z.object({
   modelId: z.string().min(1).max(60),
   configuration: z.object({ parts: z.record(z.string(), z.unknown()) }),
 });
+
+router.use('/auth', authRoutes);
 
 router.get('/health', (req, res) => {
   res.json({ status: 'ok' });

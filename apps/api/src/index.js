@@ -1,5 +1,7 @@
 import { createApp } from './app.js';
-import { env } from './config/env.js';
+import { env, assertAuthConfig } from './config/env.js';
+
+assertAuthConfig(); // stop at startup, with a clear message, if JWT_SECRET is missing
 
 const app = createApp();
 
