@@ -14,6 +14,9 @@
 // catalog, the scene follows automatically.
 //
 // This file is pure (no React, no store), so it is easy to unit test later.
+// The catalog comes from outside (the API), so every inner piece is checked
+// before it is used: a malformed catalog gives the neutral fallback color
+// instead of crashing the scene.
 // =============================================================================
 
 /**
@@ -25,6 +28,7 @@ export const FALLBACK_HEX = '#808080';
 
 /**
  * Finds a color's hex code for one part, or null if the part or color is unknown.
+ * Never throws, even if the catalog has missing or malformed pieces.
  *
  * @param {object} catalog - The catalog ({ model, parts, rules }).
  * @param {string} partKey - Part key, for example "upper".
@@ -32,10 +36,12 @@ export const FALLBACK_HEX = '#808080';
  * @returns {string|null} A hex string like "#B3202A", or null if not found.
  */
 function findColorHex(catalog, partKey, colorId) {
-  const part = catalog.parts.find((p) => p.key === partKey);
-  const color = part?.options.colors.find((c) => c.id === colorId);
+  const parts = Array.isArray(catalog.parts) ? catalog.parts : [];
+  const part = parts.find((p) => p?.key === partKey);
+  const colors = part?.options?.colors;
+  if (!Array.isArray(colors)) return null;
 
-  return color?.hex ?? null;
+  return colors.find((c) => c?.id === colorId)?.hex ?? null;
 }
 
 
@@ -64,7 +70,7 @@ export function getPartColorHex(catalog, partKey, colorId) {
     `[catalogLookup] Unknown color "${colorId}" for part "${partKey}". Using the default color.`,
   );
 
-  const defaultColorId = catalog.model.defaultConfiguration.parts[partKey]?.colorId;
+  const defaultColorId = catalog.model?.defaultConfiguration?.parts?.[partKey]?.colorId;
 
   return findColorHex(catalog, partKey, defaultColorId) ?? FALLBACK_HEX;
 }

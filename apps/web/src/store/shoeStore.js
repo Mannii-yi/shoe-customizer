@@ -29,7 +29,8 @@
 // BAD INPUT NEVER CRASHES THE APP
 // The contract says: unknown ids or keys -> console.warn and carry on. A scene
 // that crashes on one typo would break the landing page, the customizer and the
-// demo, so every action below checks its input first.
+// demo, so every action below checks its input first. The catalog comes from
+// outside (the API), so even its inner pieces are checked before they are used.
 // =============================================================================
 
 import { create } from 'zustand'; // zustand: the tiny library that builds the store
@@ -61,8 +62,8 @@ export const PART_KEYS = [
 
 /**
  * The camera angles the scene supports (the contract's CAMERA_PRESETS names).
- * The camera code (CameraRig.jsx, written later) decides WHERE each name puts
- * the camera. This list only checks that a requested name is valid.
+ * The camera code (CameraRig.jsx) decides WHERE each name puts the camera.
+ * This list only checks that a requested name is valid.
  */
 export const CAMERA_PRESET_NAMES = [
   'hero',
@@ -107,6 +108,9 @@ function clamp01(n) {
  * original and later changed a color, we would accidentally change the
  * catalog's default too. A copy keeps them separate.
  *
+ * Callers must pass real JSON data: copying `undefined` would throw, which is
+ * why setCatalog checks the default configuration before using this.
+ *
  * @param {object} obj - A plain JSON object (no functions, no dates).
  * @returns {object} A deep copy.
  */
@@ -123,6 +127,10 @@ function cloneJson(obj) {
  * If no catalog has loaded yet we cannot check, so we accept the id. It will be
  * checked properly once the catalog arrives and the server validates it anyway.
  *
+ * The catalog comes from outside (the API), so any inner piece may be missing
+ * or the wrong type. This function never throws: when it cannot check, it
+ * answers "not allowed".
+ *
  * @param {object|null} catalog - The catalog from setCatalog, or null.
  * @param {string} partKey - Which part, for example "upper".
  * @param {'materials'|'colors'} kind - Which option list to check.
@@ -132,10 +140,12 @@ function cloneJson(obj) {
 function isKnownOption(catalog, partKey, kind, id) {
   if (!catalog) return true;
 
-  const part = catalog.parts.find((p) => p.key === partKey);
-  if (!part) return false;
+  const parts = Array.isArray(catalog.parts) ? catalog.parts : [];
+  const part = parts.find((p) => p?.key === partKey);
+  const options = part?.options?.[kind];
+  if (!Array.isArray(options)) return false;
 
-  return part.options[kind].some((option) => option.id === id);
+  return options.some((option) => option?.id === id);
 }
 
 
@@ -228,14 +238,25 @@ export const useShoeStore = create((set, get) => ({
    * real color, and to know which options each part allows.
    *
    * We only fill the configuration when it is still empty, so calling this
-   * again later (for example after a refetch) does not wipe the user's choices.
+   * again later (for example after a refetch, or from a second page) does not
+   * wipe the user's choices.
    *
    * @param {object} catalog - { model, parts, rules } as in the API contract.
+   *   model.defaultConfiguration.parts must be an object, otherwise the whole
+   *   call is ignored with a warning.
    */
   setCatalog: (catalog) => {
     // Refuse anything that is not shaped like a catalog, instead of crashing later.
-    if (!catalog || !catalog.model || !Array.isArray(catalog.parts)) {
-      console.warn('[shoeStore] setCatalog ignored: expected { model, parts, rules }.');
+    // The default configuration is checked too: we clone it below, and cloning
+    // `undefined` would throw.
+    const defaultParts = catalog?.model?.defaultConfiguration?.parts;
+    const hasValidDefault =
+      typeof defaultParts === 'object' && defaultParts !== null && !Array.isArray(defaultParts);
+
+    if (!catalog || !Array.isArray(catalog.parts) || !hasValidDefault) {
+      console.warn(
+        '[shoeStore] setCatalog ignored: expected { model: { defaultConfiguration: { parts } }, parts, rules }.',
+      );
       return;
     }
 
@@ -287,13 +308,22 @@ export const useShoeStore = create((set, get) => ({
    *
    * @param {string} partKey - Which part to change, for example "upper".
    * @param {{ materialId?: string, colorId?: string }} options - What to change.
+   *   Missing, null or non-object options are ignored with a warning.
    */
-  setPartOption: (partKey, { materialId, colorId } = {}) => {
+  setPartOption: (partKey, options) => {
     if (!PART_KEYS.includes(partKey)) {
       console.warn(`[shoeStore] setPartOption ignored: unknown part "${partKey}".`);
       return;
     }
 
+    // `options` may be missing, null or not an object. (A default value like
+    // `= {}` only covers `undefined`, not `null`.) Treat those as "nothing to change".
+    if (typeof options !== 'object' || options === null) {
+      console.warn('[shoeStore] setPartOption ignored: expected { materialId?, colorId? }.');
+      return;
+    }
+
+    const { materialId, colorId } = options;
     const { catalog, configuration } = get();
 
     // What the part has now, and what the catalog says its default is.
@@ -384,11 +414,14 @@ export const useShoeStore = create((set, get) => ({
    * and start from wherever the shoe currently is, so a quick double-click
    * never makes the shoe jump.
    *
-   * @param {0|1} target - 1 to explode, 0 to assemble.
+   * @param {0|1} target - 1 to explode, 0 to assemble. Only real numbers count
+   *   (clamped to 0..1); anything else, including text like "1", means 0.
    * @param {{ duration?: number }} [options] - Seconds the animation takes (default 1.2).
    */
   tweenExplode: (target, { duration = 1.2 } = {}) => {
-    const end = clamp01(Number(target) || 0);
+    // Only real numbers count. Anything else (null, undefined, text, even a
+    // numeric string like "1") means 0, as the scene API contract says.
+    const end = typeof target === 'number' && Number.isFinite(target) ? clamp01(target) : 0;
 
     if (explodeTween) explodeTween.kill();
 
@@ -467,7 +500,7 @@ export const useShoeStore = create((set, get) => ({
   // SCENE-ONLY ADDITIONS
   // Optional extras for the scene's own use. They are not in the original
   // contract, but adding actions never breaks anyone, so this is allowed. They
-  // will be documented in contracts/scene-api.md.
+  // are documented in contracts/scene-api.md.
   // ===========================================================================
 
   /**
