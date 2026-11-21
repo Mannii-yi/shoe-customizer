@@ -7,6 +7,8 @@ import { calculateQuote } from '../services/pricing.js';
 import authRoutes from './auth.js';
 import designRoutes from './designs.js';
 import sharedRoutes from './shared.js';
+import cartRoutes from './cart.js';
+import orderRoutes from './orders.js';
 
 const router = Router();
 
@@ -21,6 +23,8 @@ const quoteBody = z.object({
 router.use('/auth', authRoutes);
 router.use('/designs', designRoutes);
 router.use('/shared', sharedRoutes);
+router.use('/cart', cartRoutes);
+router.use('/orders', orderRoutes);
 
 router.get('/health', (req, res) => {
   res.json({ status: 'ok' });

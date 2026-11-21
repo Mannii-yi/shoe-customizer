@@ -69,10 +69,16 @@ export async function updateDesign(userId, id, { name, configuration, thumbnailD
   return toDesign(await prisma.design.update({ where: { id: existing.id }, data }));
 }
 
-/** Also removes the design from any carts (database cascade). Past orders keep their own snapshot. */
+/**
+ * Also removes the design from any carts (database cascade). Past orders keep their own
+ * snapshot; their designId link is cleared because the design no longer exists.
+ */
 export async function deleteDesign(userId, id) {
-  const { count } = await prisma.design.deleteMany({ where: { id, userId } });
-  if (count === 0) throw notFound('Design not found');
+  const design = await findOwned(userId, id);
+  await prisma.$transaction([
+    prisma.orderItem.updateMany({ where: { designId: design.id }, data: { designId: null } }),
+    prisma.design.delete({ where: { id: design.id } }),
+  ]);
 }
 
 /** Creates a share token once; later calls return the same one. */

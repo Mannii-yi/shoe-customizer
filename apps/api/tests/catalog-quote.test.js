@@ -1,16 +1,19 @@
+import 'dotenv/config';
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../src/app.js';
 
 const app = createApp();
 const api = '/api/v1';
+// The catalog now lives in the database, so these tests need DATABASE_URL and a seeded database.
+const hasDb = Boolean(process.env.DATABASE_URL);
 
 async function defaultConfig() {
   const res = await request(app).get(`${api}/models/runner-01/catalog`);
   return structuredClone(res.body.model.defaultConfiguration);
 }
 
-describe('GET /models', () => {
+describe.skipIf(!hasDb)('GET /models', () => {
   it('lists the model', async () => {
     const res = await request(app).get(`${api}/models`);
     expect(res.status).toBe(200);
@@ -23,7 +26,7 @@ describe('GET /models', () => {
   });
 });
 
-describe('GET /models/:modelId/catalog', () => {
+describe.skipIf(!hasDb)('GET /models/:modelId/catalog', () => {
   it('returns the contract shape with 10 parts', async () => {
     const res = await request(app).get(`${api}/models/runner-01/catalog`);
     expect(res.status).toBe(200);
@@ -49,7 +52,7 @@ describe('GET /models/:modelId/catalog', () => {
   });
 });
 
-describe('POST /price/quote', () => {
+describe.skipIf(!hasDb)('POST /price/quote', () => {
   it('prices the default shoe at the base price', async () => {
     const res = await request(app)
       .post(`${api}/price/quote`)
