@@ -10,21 +10,24 @@
 //   <ShoeScene variant="hero" />          landing page, no user controls
 //   <ShoeScene variant="configurator" />  customizer, drag to rotate + picking
 //
-// CURRENT STATE: STEP 5 OF THE STUB
-// The "shoe" is 10 named, colored boxes (StubShoe) that explode, can be picked
-// with the mouse, turn slowly on request, and the camera glides between named
-// views. Next tasks add lighting and the real GLB model.
+// CURRENT STATE: STEP 6
+// The shoe is the REAL model (ShoeModel, loaded from runner.glb). If the file
+// cannot be loaded, or is missing a part, the placeholder box shoe (StubShoe)
+// is shown instead, so the page never breaks.
 //
 // RULE
 // This component fills its parent element, so the parent MUST have a size
 // (width and height). If the parent has no height, the canvas is invisible.
 // =============================================================================
 
+import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 
 import { CameraRig } from './CameraRig';
 import { CAMERA_PRESETS } from './cameraPresets';
+import { ModelErrorBoundary } from './ModelErrorBoundary';
+import { ShoeModel } from './ShoeModel';
 import { StubShoe } from './StubShoe';
 import { Turntable } from './Turntable';
 import { useShoeStore } from '../store/shoeStore';
@@ -57,12 +60,18 @@ export function ShoeScene({ variant = 'configurator' }) {
       {/* A soft light that lights everything equally, so shadows are never pitch black. */}
       <ambientLight intensity={0.6} />
 
-      {/* A light shining from one direction, like the sun. It gives the boxes shape. */}
+      {/* A light shining from one direction, like the sun. It gives the shoe shape. */}
       <directionalLight position={[5, 5, 5]} intensity={1.2} />
 
       {/* Turntable slowly spins the shoe while the store's autoRotate is on. */}
       <Turntable>
-        <StubShoe interactive={interactive} />
+        {/* If loading the model fails, show the placeholder shoe instead. */}
+        <ModelErrorBoundary fallback={<StubShoe interactive={interactive} />}>
+          {/* While the file loads, show nothing (isModelReady stays false). */}
+          <Suspense fallback={null}>
+            <ShoeModel interactive={interactive} />
+          </Suspense>
+        </ModelErrorBoundary>
       </Turntable>
 
       {/* Glides the camera to whichever preset the store asks for. */}
