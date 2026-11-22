@@ -1,5 +1,13 @@
 {
   "name": "shoe-customizer",
   "private": true,
-  "workspaces": ["apps/*"]
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "db:seed": "node apps/api/prisma/seed.js"
+  },
+  "prisma": {
+    "seed": "node apps/api/prisma/seed.js"
+  }
 }

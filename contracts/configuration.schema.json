@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shoe-customizer.local/contracts/configuration.schema.json",
+  "title": "Configuration",
+  "description": "A shoe configuration: one material and one color for each of the 10 parts. Used by the scene store, API requests, saved designs and order snapshots. Whether an id is allowed for a given part is decided by the catalog, not by this schema.",
+  "type": "object",
+  "required": ["parts"],
+  "additionalProperties": false,
+  "properties": {
+    "parts": {
+      "type": "object",
+      "required": [
+        "upper", "toe_cap", "heel_counter", "tongue", "eyestay",
+        "laces", "logo", "insole", "midsole", "outsole"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "upper": { "$ref": "#/$defs/PartChoice" },
+        "toe_cap": { "$ref": "#/$defs/PartChoice" },
+        "heel_counter": { "$ref": "#/$defs/PartChoice" },
+        "tongue": { "$ref": "#/$defs/PartChoice" },
+        "eyestay": { "$ref": "#/$defs/PartChoice" },
+        "laces": { "$ref": "#/$defs/PartChoice" },
+        "logo": { "$ref": "#/$defs/PartChoice" },
+        "insole": { "$ref": "#/$defs/PartChoice" },
+        "midsole": { "$ref": "#/$defs/PartChoice" },
+        "outsole": { "$ref": "#/$defs/PartChoice" }
+      }
+    }
+  },
+  "$defs": {
+    "Slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 40
+    },
+    "PartChoice": {
+      "type": "object",
+      "required": ["materialId", "colorId"],
+      "additionalProperties": false,
+      "properties": {
+        "materialId": { "$ref": "#/$defs/Slug" },
+        "colorId": { "$ref": "#/$defs/Slug" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "parts": {
+        "upper": { "materialId": "mesh", "colorId": "bone" },
+        "toe_cap": { "materialId": "rubber", "colorId": "white" },
+        "heel_counter": { "materialId": "rubber", "colorId": "graphite" },
+        "tongue": { "materialId": "mesh", "colorId": "bone" },
+        "eyestay": { "materialId": "mesh", "colorId": "bone" },
+        "laces": { "materialId": "canvas", "colorId": "white" },
+        "logo": { "materialId": "patent", "colorId": "black" },
+        "insole": { "materialId": "foam", "colorId": "white" },
+        "midsole": { "materialId": "foam", "colorId": "white" },
+        "outsole": { "materialId": "rubber", "colorId": "graphite" }
+      }
+    }
+  ]
+}
