@@ -1,0 +1,12 @@
+[
+  { "key": "upper", "label": "Upper", "meshName": "part_upper" },
+  { "key": "toe_cap", "label": "Toe cap", "meshName": "part_toe_cap" },
+  { "key": "heel_counter", "label": "Heel counter", "meshName": "part_heel_counter" },
+  { "key": "tongue", "label": "Tongue", "meshName": "part_tongue" },
+  { "key": "eyestay", "label": "Eyestay (lace panel)", "meshName": "part_eyestay" },
+  { "key": "laces", "label": "Laces", "meshName": "part_laces" },
+  { "key": "logo", "label": "Logo patch", "meshName": "part_logo" },
+  { "key": "insole", "label": "Insole", "meshName": "part_insole" },
+  { "key": "midsole", "label": "Midsole", "meshName": "part_midsole" },
+  { "key": "outsole", "label": "Outsole", "meshName": "part_outsole" }
+]
