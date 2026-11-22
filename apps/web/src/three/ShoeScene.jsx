@@ -26,6 +26,7 @@ import { OrbitControls } from '@react-three/drei';
 
 import { CameraRig } from './CameraRig';
 import { CAMERA_PRESETS } from './cameraPresets';
+import { Lighting } from './Lighting';
 import { ModelErrorBoundary } from './ModelErrorBoundary';
 import { ShoeModel } from './ShoeModel';
 import { StubShoe } from './StubShoe';
@@ -49,6 +50,7 @@ export function ShoeScene({ variant = 'configurator' }) {
     <Canvas
       // Start exactly at the "hero" view so there is no jump on the first frame.
       camera={{ position: CAMERA_PRESETS.hero.position, fov: 40 }}
+      flat // no tone mapping, so the colors on screen match the catalog's hex colors
       gl={{ alpha: true }} // transparent background so the page backdrop shows through
 
       // Fires when the user clicks the canvas but hits NO part: deselect.
@@ -57,11 +59,8 @@ export function ShoeScene({ variant = 'configurator' }) {
         interactive ? () => useShoeStore.getState().selectPart(null) : undefined
       }
     >
-      {/* A soft light that lights everything equally, so shadows are never pitch black. */}
-      <ambientLight intensity={0.6} />
-
-      {/* A light shining from one direction, like the sun. It gives the shoe shape. */}
-      <directionalLight position={[5, 5, 5]} intensity={1.2} />
+           {/* All the lights (ambient, warm key, cool rim, soft environment): see Lighting.jsx */}
+      <Lighting />
 
       {/* Turntable slowly spins the shoe while the store's autoRotate is on. */}
       <Turntable>
