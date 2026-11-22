@@ -5,9 +5,9 @@
     "apps/*"
   ],
   "scripts": {
-    "db:seed": "node prisma/seed.js"
+    "db:seed": "node apps/api/prisma/seed.js"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node apps/api/prisma/seed.js"
   }
 }
