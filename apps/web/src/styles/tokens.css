@@ -1,0 +1,31 @@
+/* tokens.css  (apps/web/src/styles/tokens.css)  Owner: Dev B
+ * Design tokens for the light "Runner" look. Tailwind reads these via tailwind.config.js.
+ * Contrast: ink on bg 15:1, muted on bg 5:1, ink on coral 6.6:1, white on blue 6.2:1.
+ * Do NOT put white text on coral or lime (fails 4.5:1). */
+:root{
+  --color-bg:#f6efe6;--color-surface:#ffffff;--color-ink:#131313;--color-muted:#6a645b;--color-border:#ddd5c9;
+  --color-coral:#ff5a3c;--color-blue:#2b50ff;--color-lime:#c8f23c;--color-pink:#ffa8d4;
+  --color-danger:#b42318;--color-success:#12805c;
+  --font-display:'Anton',Impact,'Arial Narrow',sans-serif;--font-sans:'Inter',system-ui,sans-serif;
+  --radius-sm:12px;--radius-md:20px;--radius-lg:28px;--radius-pill:999px;
+  --shadow-card:0 10px 24px rgba(19,19,19,.10);--shadow-lift:0 22px 44px rgba(19,19,19,.22);
+  --ease-out:cubic-bezier(.22,1,.36,1);--dur-fast:.2s;--dur-base:.5s;--dur-slow:.9s;
+  --focus-ring:0 0 0 3px var(--color-bg),0 0 0 5px var(--color-blue);
+}
+html{background:var(--color-bg);color:var(--color-ink);font-family:var(--font-sans)}
+body{margin:0}
+.route-fade{animation:routeFade var(--dur-base) var(--ease-out)}
+@keyframes routeFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes shimmer{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+/* --- shop-design effects (Dev B) --- */
+@keyframes marquee{to{transform:translateX(-50%)}}
+@keyframes drawerIn{from{transform:translateX(110%)}to{transform:none}}
+@keyframes blobFloat{to{transform:translate(6vw,-5vh) scale(1.15)}}
+@keyframes rainbow{to{background-position:0 0,300% 0}}
+.pc-shine{position:relative;overflow:hidden}
+.pc-shine::before{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-18deg);transition:left .8s;pointer-events:none}
+.pc-shine:hover::before{left:130%}
+.pc-rainbow{border:2px solid transparent!important;background:linear-gradient(var(--pc-bg),var(--pc-bg)) padding-box,linear-gradient(120deg,#ff5a3c,#c8f23c,#2b50ff,#ff5a3c) border-box!important;background-size:auto,300% 100%!important;animation:rainbow 5s linear infinite}
+.rvl{opacity:0;transform:translateY(30px);transition:opacity .8s var(--ease-out),transform .8s var(--ease-out)}.rvl.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rvl{opacity:1;transform:none}.pc-rainbow{animation:none}}

@@ -1,4 +1,7 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+
+import AppLayout from './layout/AppLayout';
+import Landing from './pages/Landing';
 
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -7,25 +10,35 @@ import Designs from './pages/Designs';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
-import NotFound from './pages/NotFound';
+
 import SharedDesign from './pages/SharedDesign';
+import NotFound from './pages/NotFound';
+
+import UiKitchenSink from './ui/dev/UiKitchenSink';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route element={<AppLayout />}>
+        <Route index element={<Landing />} />
 
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Signup />} />
-      <Route path="/customize" element={<Customizer />} />
-      <Route path="/designs" element={<Designs />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/checkout" element={<Checkout />} />
-      <Route path="/orders" element={<Orders />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Signup />} />
 
-      <Route path="/shared/:token" element={<SharedDesign />} />
+        <Route path="/customize" element={<Customizer />} />
+        <Route path="/designs" element={<Designs />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/orders" element={<Orders />} />
 
-      <Route path="*" element={<NotFound />} />
+        <Route path="/shared/:token" element={<SharedDesign />} />
+
+        {import.meta.env.DEV && (
+          <Route path="/dev/ui" element={<UiKitchenSink />} />
+        )}
+
+        <Route path="*" element={<NotFound />} />
+      </Route>
     </Routes>
   );
 }

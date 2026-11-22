@@ -32,14 +32,8 @@ import { useFrame } from '@react-three/fiber';
 import { PART_LAYOUT } from './partsConfig';
 import { getPartColorHex } from './catalogLookup';
 import { getExplodeOffset } from './explode';
+import { HIGHLIGHT_COLOR, HOVER_INTENSITY, SELECTED_INTENSITY } from './highlight';
 import { useShoeStore } from '../store/shoeStore';
-
-
-// The highlight glow. This is a UI accent, NOT a product color, so it is fine
-// that it does not come from the catalog.
-const HIGHLIGHT_COLOR = '#D4AF37';
-const HOVER_INTENSITY = 0.35; // gentle glow while the pointer is over a part
-const SELECTED_INTENSITY = 0.7; // stronger glow for the selected part
 
 
 /**
